@@ -28,19 +28,19 @@ async function startApolloServer() {
 
   server.applyMiddleware({ app, path: '/graphql' });
 
-  app.listen({ port: 4000 }, () =>
+  app.listen({ port: PORT }, () =>
     console.log(`Server ready at http://localhost:4000${server.graphqlPath}`)
   );
 }
 
 if (process.env.NODE_ENV === 'production') {
-  console.log('===> Running in production mode');
+  console.log('===> Running in production mode', process.env.NODE_ENV);
 } else if (process.env.NODE_ENV === 'development') {
-  console.log('===> Running in development mode');
+  console.log('===> Running in development mode', process.env.NODE_ENV);
 } else if (process.env.NODE_ENV === 'test') {
-  console.log('===> Running in test mode');
+  console.log('===> Running in test mode', process.env.NODE_ENV);
 } else {
-  console.log('===> Unknown environment');
+  console.log('===> Unknown environment', process.env.NODE_ENV);
 }
 
 startApolloServer();
