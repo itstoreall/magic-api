@@ -19,6 +19,7 @@ const typeDefs = `#graphql
   type Book {
     title: String
     author: String
+    time: String,
   }
 
   # The "Query" type is special: it lists all of the available queries that
@@ -26,6 +27,7 @@ const typeDefs = `#graphql
   # case, the "books" query returns an array of zero or more Books (defined above).
   type Query {
     books: [Book]
+    times: [Book]
   }
 `;
 
@@ -33,10 +35,12 @@ const books = [
   {
     title: 'The Awakening',
     author: 'Kate Chopin',
+    time: 2456778,
   },
   {
     title: 'City of Glass',
     author: 'Paul Auster',
+    time: 5567,
   },
 ];
 
@@ -45,6 +49,7 @@ const books = [
 const resolvers = {
   Query: {
     books: () => books,
+    times: () => books,
   },
 };
 
