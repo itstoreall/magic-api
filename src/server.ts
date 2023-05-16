@@ -1,4 +1,3 @@
-// /*
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
 import mongoose from 'mongoose';
@@ -86,9 +85,9 @@ const server = new ApolloServer({
   resolvers,
 });
 
-const { url } = await startStandaloneServer(server, {
+startStandaloneServer(server, {
   listen: { port: Number(PORT) },
-});
+}).then(({ url }) => console.log(`🚀 Server listening at: ${String(url)}`));
 
 if (process.env.NODE_ENV === 'production') {
   console.log('===> Running in production mode', process.env.NODE_ENV);
@@ -99,5 +98,3 @@ if (process.env.NODE_ENV === 'production') {
 } else {
   console.log('===> Unknown environment', process.env.NODE_ENV);
 }
-
-console.log(`🚀 Server listening at: ${url}`);

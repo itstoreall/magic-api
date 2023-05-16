@@ -1,1 +1,1 @@
-# magic-api
+# Magic API
