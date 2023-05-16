@@ -1,4 +1,4 @@
-import Recipe from '../models/Recipe';
+import Recipe from '../models/Book';
 
 const resolvers = {
   Query: {

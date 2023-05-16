@@ -1,63 +1,48 @@
 // /*
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-import mongoose, { ConnectOptions } from 'mongoose';
+import mongoose from 'mongoose';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 const PORT = process.env.PORT || 4001;
 
 console.log('PORT', process.env.PORT);
 
-const MONGODB = process.env.MONGO_DB;
-
-console.log('MONGODB', MONGODB);
-
-mongoose.connect(MONGODB, {
-  // useNewUrlParser: true,
-  // useUnifiedTopology: true,
-});
+mongoose.connect(process.env.MONGO_DB);
 
 const typeDefs = `#graphql
 
   type Book {
+    id: String
+    title: String
+  }
+
+  input BookInput {
+    id: String
     title: String
   }
 
   type Query {
     books: [Book]
   }
+
+  type Mutation {
+    addBook(input: BookInput): Book
+  }
 `;
 
-// const books = [
-//   {
-//     title: 'The Awakening',
-//     author: 'Kate Chopin',
-//     time: 2456778,
-//   },
-//   {
-//     title: 'City of Glass',
-//     author: 'Paul Auster',
-//     time: 5567,
-//   },
-// ];
-
+// /*
 const bookSchema = new mongoose.Schema({
+  id: String,
   title: String,
-  // author: String,
-  // time: String,
 });
 
 const Book = mongoose.model('Book', bookSchema);
-
-// const resolvers = {
-//   Query: {
-//     books: () => books,
-//     times: () => books,
-//   },
-// };
+// */
 
 const resolvers = {
   Query: {
@@ -71,6 +56,23 @@ const resolvers = {
       } catch (error) {
         throw new Error('Failed to fetch books');
       }
+    },
+  },
+  Mutation: {
+    async addBook(_, { input }) {
+      const createBook = new Book({
+        id: input.id,
+        title: input.title,
+      });
+
+      const res = await createBook.save();
+
+      console.log('res ----->', res); // res._dec
+
+      return {
+        id: res.id,
+        title: res.title,
+      };
     },
   },
 };
@@ -99,74 +101,3 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 console.log(`🚀 Server listening at: ${url}`);
-// */
-
-/*
-import { ApolloServer } from 'apollo-server';
-import mongoose, { ConnectOptions } from 'mongoose';
-import { TypedDocumentNode } from '@graphql-typed-document-node/core';
-// import typeDefs from './graphql/typeDefs';
-// import resolvers from './graphql/resolvers';
-
-const MONGODB =
-  'mongodb+srv://magic_db_user:magic_db_passm@itstoreall.daksk.mongodb.net';
-
-const PORT = process.env.PORT || 4001;
-
-console.log('PORT', process.env.PORT);
-
-const typeDefs = `#graphql
-
-  type Book {
-    title: String
-    author: String
-    time: String,
-  }
-
-  type Query {
-    books: [Book]
-    times: [Book]
-  }
-`;
-
-const books = [
-  {
-    title: 'The Awakening',
-    author: 'Kate Chopin',
-    time: 2456778,
-  },
-  {
-    title: 'City of Glass',
-    author: 'Paul Auster',
-    time: 5567,
-  },
-];
-
-const resolvers = {
-  Query: {
-    books: () => books,
-    times: () => books,
-  },
-};
-
-// const server = new ApolloServer({
-//   typeDefs,
-//   // resolvers,
-//   // context: { models },
-// });
-
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-});
-
-mongoose
-  .connect(MONGODB)
-  .then(() => {
-    console.log('!!!!!!!!!!!');
-    return server.listen({ port: PORT });
-  })
-  .then(res => {
-    console.log('!!!222!!!', res.url);
-  });
-// */
