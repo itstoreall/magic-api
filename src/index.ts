@@ -1,5 +1,6 @@
 import express from 'express';
 import { ApolloServer, gql } from 'apollo-server-express';
+import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -20,6 +21,8 @@ const resolvers = {
 };
 
 const app = express();
+
+app.use(cors());
 
 const server = new ApolloServer({
   typeDefs,
