@@ -9,8 +9,6 @@ dotenv.config();
 
 const PORT = process.env.PORT || 4001;
 
-// console.log('PORT', process.env.PORT);
-
 mongoose.connect(process.env.MONGO_DB);
 
 const typeDefs = `#graphql
@@ -28,14 +26,6 @@ const typeDefs = `#graphql
 
   type Query {
     articles: [Article]
-    #getArticleById(ID: ID!): Article
-    #getArticleByTitle(title: String!): Article
-  }
-
-  type Mutation {
-    addArticle(input: ArticleInput): Article
-    #deleteArticle(ID: ID!): Boolean
-    #editArticle(ID: ID!, articleInput: ArticleInput): Boolean
   }
 `;
 
@@ -61,54 +51,6 @@ const resolvers = {
         throw new Error('Failed to fetch books');
       }
     },
-
-    // async getArticleById(_: any, { ID }: any) {
-    //   const res = await Articles.find({ _id: ID });
-
-    //   console.log('getArticleById article:', res);
-
-    //   return { id: res[0]._id, title: res[0].title, article: res[0].article };
-    // },
-
-    // async getArticleByTitle(_: any, { title }: any) {
-    //   const res = await Articles.find({ title });
-
-    //   console.log('getArticleByTitle article:', res);
-
-    //   return { id: res[0]._id, title: res[0].title, article: res[0].article };
-    // },
-  },
-  Mutation: {
-    async addArticle(_: any, { input }: any) {
-      const createArticle = new Articles({
-        title: input.title,
-        article: input.article,
-      });
-
-      const res = await createArticle.save();
-
-      console.log('add article:', res);
-
-      return { id: res._id, ...res };
-    },
-
-    // async deleteArticle(_: any, { ID }) {
-    //   const wasDeleted = (await Articles.deleteOne({ _id: ID })).deletedCount;
-
-    //   console.log('wasDeleted:', wasDeleted);
-
-    //   return wasDeleted;
-    // },
-
-    // async editArticle(_: any, { ID, articleInput: { title, article } }) {
-    //   const wasEdited = (
-    //     await Articles.updateOne({ _id: ID }, { title, article })
-    //   ).modifiedCount;
-
-    //   console.log('wasEdited:', wasEdited);
-
-    //   return wasEdited;
-    // },
   },
 };
 
@@ -124,13 +66,3 @@ const server = new ApolloServer({
 startStandaloneServer(server, {
   listen: { port: Number(PORT) },
 }).then(({ url }) => console.log(`server ★(◔.◔)★ ${String(url)}`));
-
-// if (process.env.NODE_ENV === 'production') {
-//   console.log('===> Running in production mode', process.env.NODE_ENV);
-// } else if (process.env.NODE_ENV === 'development') {
-//   console.log('===> Running in development mode', process.env.NODE_ENV);
-// } else if (process.env.NODE_ENV === 'test') {
-//   console.log('===> Running in test mode', process.env.NODE_ENV);
-// } else {
-//   console.log('===> Unknown environment', process.env.NODE_ENV);
-// }
