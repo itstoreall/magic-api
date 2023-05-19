@@ -14,12 +14,13 @@ mongoose.connect(process.env.MONGO_DB);
 const typeDefs = `#graphql
 
   type Article {
-    id: ID
+    id: String
     title: String
     article: String
   }
 
   input ArticleInput {
+    id: String
     title: String
     article: String
   }
@@ -27,22 +28,27 @@ const typeDefs = `#graphql
   type Query {
     articles: [Article]
   }
+
+  type Mutation {
+    addArticle(input: ArticleInput): Article
+  }
 `;
 
 // /*
-const articlesSchema = new mongoose.Schema({
+const ArticleSchema = new mongoose.Schema({
+  id: String,
   title: String,
   article: String,
 });
 
-const Articles = mongoose.model('Articles', articlesSchema);
+const Article = mongoose.model('Article', ArticleSchema);
 // */
 
 const resolvers = {
   Query: {
     articles: async () => {
       try {
-        const res = await Articles.find();
+        const res = await Article.find();
 
         console.log('getAll articles:', res?.length);
 
@@ -50,6 +56,26 @@ const resolvers = {
       } catch (error) {
         throw new Error('Failed to fetch books');
       }
+    },
+  },
+
+  Mutation: {
+    async addArticle(_: any, { input }: any) {
+      const createArticle = new Article({
+        id: input.id,
+        title: input.title,
+        article: input.article,
+      });
+
+      const res = await createArticle.save();
+
+      console.log('add article:', res);
+
+      return {
+        id: res.id,
+        title: res.title,
+        article: res.article,
+      };
     },
   },
 };
