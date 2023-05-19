@@ -9,8 +9,6 @@ dotenv.config();
 
 const PORT = process.env.PORT || 4001;
 
-console.log('PORT', process.env.PORT);
-
 mongoose.connect(process.env.MONGO_DB);
 
 const typeDefs = `#graphql
@@ -19,37 +17,39 @@ const typeDefs = `#graphql
     id: ID
     title: String
     article: String
-    autor: String
+    author: String
     image: String 
   }
 
   input ArticleInput {
     title: String
     article: String
-    autor: String
+    author: String
     image: String 
   }
 
   type Query {
     articles: [Article]
+    getArticleById(ID: ID!): Article
+    getArticleByTitle(title: String!): Article
   }
 
   type Mutation {
     addArticle(input: ArticleInput): Article
     deleteArticle(ID: ID!): Boolean
+    editArticle(ID: ID!, articleInput: ArticleInput): Boolean
   }
 `;
 
-// /*
-const articleSchema = new mongoose.Schema({
-  title: String,
-  article: String,
-  autor: String,
-  image: String,
-});
-
-const Article = mongoose.model('Article', articleSchema);
-// */
+const Article = mongoose.model(
+  'Article',
+  new mongoose.Schema({
+    title: String,
+    article: String,
+    author: String,
+    image: String,
+  })
+);
 
 const resolvers = {
   Query: {
@@ -64,13 +64,42 @@ const resolvers = {
         throw new Error('Failed to fetch books');
       }
     },
+
+    getArticleById: async (_: any, { ID }: any) => {
+      const res = await Article.find({ _id: ID });
+
+      console.log('getArticleById:', res);
+
+      return {
+        id: res[0]._id,
+        title: res[0].title,
+        article: res[0].article,
+        author: res[0].author,
+        image: res[0].image,
+      };
+    },
+
+    async getArticleByTitle(_: any, { title }: any) {
+      const res = await Article.find({ title });
+
+      console.log('getArticleByTitle:', res);
+
+      return {
+        id: res[0]._id,
+        title: res[0].title,
+        article: res[0].article,
+        author: res[0].author,
+        image: res[0].image,
+      };
+    },
   },
+
   Mutation: {
     addArticle: async (_: any, { input }) => {
       const createArticle = new Article({
         title: input.title,
         article: input.article,
-        autor: input.autor,
+        author: input.author,
         image: input.image,
       });
 
@@ -81,7 +110,7 @@ const resolvers = {
       return {
         title: res.title,
         article: res.article,
-        autor: res.autor,
+        author: res.author,
         image: res.image,
       };
     },
@@ -92,6 +121,16 @@ const resolvers = {
       console.log('wasDeleted:', wasDeleted);
 
       return wasDeleted;
+    },
+
+    async editArticle(_: any, { ID, articleInput }) {
+      const wasEdited = (
+        await Article.updateOne({ _id: ID }, { ...articleInput })
+      ).modifiedCount;
+
+      console.log('wasEdited:', wasEdited);
+
+      return wasEdited;
     },
   },
 };
@@ -108,13 +147,3 @@ const server = new ApolloServer({
 startStandaloneServer(server, {
   listen: { port: Number(PORT) },
 }).then(({ url }) => console.log(`🚀 Server listening at: ${String(url)}`));
-
-if (process.env.NODE_ENV === 'production') {
-  console.log('===> Running in production mode', process.env.NODE_ENV);
-} else if (process.env.NODE_ENV === 'development') {
-  console.log('===> Running in development mode', process.env.NODE_ENV);
-} else if (process.env.NODE_ENV === 'test') {
-  console.log('===> Running in test mode', process.env.NODE_ENV);
-} else {
-  console.log('===> Unknown environment', process.env.NODE_ENV);
-}
