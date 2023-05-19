@@ -16,7 +16,7 @@ mongoose.connect(process.env.MONGO_DB);
 const typeDefs = `#graphql
 
   type Article {
-    id: String
+    id: ID
     title: String
     article: String
     autor: String
@@ -24,7 +24,6 @@ const typeDefs = `#graphql
   }
 
   input ArticleInput {
-    id: String
     title: String
     article: String
     autor: String
@@ -37,12 +36,12 @@ const typeDefs = `#graphql
 
   type Mutation {
     addArticle(input: ArticleInput): Article
+    deleteArticle(ID: ID!): Boolean
   }
 `;
 
 // /*
 const articleSchema = new mongoose.Schema({
-  id: String,
   title: String,
   article: String,
   autor: String,
@@ -56,10 +55,10 @@ const resolvers = {
   Query: {
     articles: async () => {
       try {
-        console.log(111);
-
         const res = await Article.find();
-        console.log(222, res);
+
+        console.log('articles:', res?.length);
+
         return res;
       } catch (error) {
         throw new Error('Failed to fetch books');
@@ -67,9 +66,8 @@ const resolvers = {
     },
   },
   Mutation: {
-    async addArticle(_: any, { input }) {
+    addArticle: async (_: any, { input }) => {
       const createArticle = new Article({
-        id: input.id,
         title: input.title,
         article: input.article,
         autor: input.autor,
@@ -78,15 +76,22 @@ const resolvers = {
 
       const res = await createArticle.save();
 
-      console.log('res ----->', res); // res._dec
+      console.log('addArticle:', res);
 
       return {
-        id: res.id,
         title: res.title,
         article: res.article,
         autor: res.autor,
         image: res.image,
       };
+    },
+
+    deleteArticle: async (_: any, { ID }) => {
+      const wasDeleted = (await Article.deleteOne({ _id: ID })).deletedCount;
+
+      console.log('wasDeleted:', wasDeleted);
+
+      return wasDeleted;
     },
   },
 };
