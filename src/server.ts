@@ -15,41 +15,41 @@ mongoose.connect(process.env.MONGO_DB);
 
 const typeDefs = `#graphql
 
-  type Book {
+  type Article {
     id: String
     title: String
   }
 
-  input BookInput {
+  input ArticleInput {
     id: String
     title: String
   }
 
   type Query {
-    books: [Book]
+    articles: [Article]
   }
 
   type Mutation {
-    addBook(input: BookInput): Book
+    addArticle(input: ArticleInput): Article
   }
 `;
 
 // /*
-const bookSchema = new mongoose.Schema({
+const articleSchema = new mongoose.Schema({
   id: String,
   title: String,
 });
 
-const Book = mongoose.model('Book', bookSchema);
+const Article = mongoose.model('Article', articleSchema);
 // */
 
 const resolvers = {
   Query: {
-    books: async () => {
+    articles: async () => {
       try {
         console.log(111);
 
-        const res = await Book.find();
+        const res = await Article.find();
         console.log(222, res);
         return res;
       } catch (error) {
@@ -58,13 +58,13 @@ const resolvers = {
     },
   },
   Mutation: {
-    async addBook(_, { input }) {
-      const createBook = new Book({
+    async addArticle(_: any, { input }) {
+      const createArticle = new Article({
         id: input.id,
         title: input.title,
       });
 
-      const res = await createBook.save();
+      const res = await createArticle.save();
 
       console.log('res ----->', res); // res._dec
 
