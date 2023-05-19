@@ -9,7 +9,7 @@ dotenv.config();
 
 const PORT = process.env.PORT || 4001;
 
-console.log('PORT', process.env.PORT);
+// console.log('PORT', process.env.PORT);
 
 mongoose.connect(process.env.MONGO_DB);
 
@@ -28,14 +28,14 @@ const typeDefs = `#graphql
 
   type Query {
     articles: [Article]
-    getArticleById(ID: ID!): Article
-    getArticleByTitle(title: String!): Article
+    #getArticleById(ID: ID!): Article
+    #getArticleByTitle(title: String!): Article
   }
 
   type Mutation {
     addArticle(input: ArticleInput): Article
-    deleteArticle(ID: ID!): Boolean
-    editArticle(ID: ID!, articleInput: ArticleInput): Boolean
+    #deleteArticle(ID: ID!): Boolean
+    #editArticle(ID: ID!, articleInput: ArticleInput): Boolean
   }
 `;
 
@@ -62,21 +62,21 @@ const resolvers = {
       }
     },
 
-    async getArticleById(_: any, { ID }: any) {
-      const res = await Articles.find({ _id: ID });
+    // async getArticleById(_: any, { ID }: any) {
+    //   const res = await Articles.find({ _id: ID });
 
-      console.log('getArticleById article:', res);
+    //   console.log('getArticleById article:', res);
 
-      return { id: res[0]._id, title: res[0].title, article: res[0].article };
-    },
+    //   return { id: res[0]._id, title: res[0].title, article: res[0].article };
+    // },
 
-    async getArticleByTitle(_: any, { title }: any) {
-      const res = await Articles.find({ title });
+    // async getArticleByTitle(_: any, { title }: any) {
+    //   const res = await Articles.find({ title });
 
-      console.log('getArticleByTitle article:', res);
+    //   console.log('getArticleByTitle article:', res);
 
-      return { id: res[0]._id, title: res[0].title, article: res[0].article };
-    },
+    //   return { id: res[0]._id, title: res[0].title, article: res[0].article };
+    // },
   },
   Mutation: {
     async addArticle(_: any, { input }: any) {
@@ -92,23 +92,23 @@ const resolvers = {
       return { id: res._id, ...res };
     },
 
-    async deleteArticle(_: any, { ID }) {
-      const wasDeleted = (await Articles.deleteOne({ _id: ID })).deletedCount;
+    // async deleteArticle(_: any, { ID }) {
+    //   const wasDeleted = (await Articles.deleteOne({ _id: ID })).deletedCount;
 
-      console.log('wasDeleted:', wasDeleted);
+    //   console.log('wasDeleted:', wasDeleted);
 
-      return wasDeleted;
-    },
+    //   return wasDeleted;
+    // },
 
-    async editArticle(_: any, { ID, articleInput: { title, article } }) {
-      const wasEdited = (
-        await Articles.updateOne({ _id: ID }, { title, article })
-      ).modifiedCount;
+    // async editArticle(_: any, { ID, articleInput: { title, article } }) {
+    //   const wasEdited = (
+    //     await Articles.updateOne({ _id: ID }, { title, article })
+    //   ).modifiedCount;
 
-      console.log('wasEdited:', wasEdited);
+    //   console.log('wasEdited:', wasEdited);
 
-      return wasEdited;
-    },
+    //   return wasEdited;
+    // },
   },
 };
 
@@ -123,14 +123,14 @@ const server = new ApolloServer({
 
 startStandaloneServer(server, {
   listen: { port: Number(PORT) },
-}).then(({ url }) => console.log(`🚀 Server listening at: ${String(url)}`));
+}).then(({ url }) => console.log(`server ★(◔.◔)★ ${String(url)}`));
 
-if (process.env.NODE_ENV === 'production') {
-  console.log('===> Running in production mode', process.env.NODE_ENV);
-} else if (process.env.NODE_ENV === 'development') {
-  console.log('===> Running in development mode', process.env.NODE_ENV);
-} else if (process.env.NODE_ENV === 'test') {
-  console.log('===> Running in test mode', process.env.NODE_ENV);
-} else {
-  console.log('===> Unknown environment', process.env.NODE_ENV);
-}
+// if (process.env.NODE_ENV === 'production') {
+//   console.log('===> Running in production mode', process.env.NODE_ENV);
+// } else if (process.env.NODE_ENV === 'development') {
+//   console.log('===> Running in development mode', process.env.NODE_ENV);
+// } else if (process.env.NODE_ENV === 'test') {
+//   console.log('===> Running in test mode', process.env.NODE_ENV);
+// } else {
+//   console.log('===> Unknown environment', process.env.NODE_ENV);
+// }
