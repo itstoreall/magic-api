@@ -15,63 +15,99 @@ mongoose.connect(process.env.MONGO_DB);
 
 const typeDefs = `#graphql
 
-  type Book {
-    id: String
+  type Article {
+    id: ID
     title: String
+    article: String
   }
 
-  input BookInput {
-    id: String
+  input ArticleInput {
     title: String
+    article: String
   }
 
   type Query {
-    books: [Book]
+    articles: [Article]
+    getArticleById(ID: ID!): Article
+    getArticleByTitle(title: String!): Article
   }
 
   type Mutation {
-    addBook(input: BookInput): Book
+    addArticle(input: ArticleInput): Article
+    deleteArticle(ID: ID!): Boolean
+    editArticle(ID: ID!, articleInput: ArticleInput): Boolean
   }
 `;
 
 // /*
-const bookSchema = new mongoose.Schema({
-  id: String,
+const articlesSchema = new mongoose.Schema({
   title: String,
+  article: String,
 });
 
-const Book = mongoose.model('Book', bookSchema);
+const Articles = mongoose.model('Articles', articlesSchema);
 // */
 
 const resolvers = {
   Query: {
-    books: async () => {
+    articles: async () => {
       try {
-        console.log(111);
+        const res = await Articles.find();
 
-        const res = await Book.find();
-        console.log(222, res);
+        console.log('getAll articles:', res?.length);
+
         return res;
       } catch (error) {
         throw new Error('Failed to fetch books');
       }
     },
+
+    async getArticleById(_: any, { ID }: any) {
+      const res = await Articles.find({ _id: ID });
+
+      console.log('getArticleById article:', res);
+
+      return { id: res[0]._id, title: res[0].title, article: res[0].article };
+    },
+
+    async getArticleByTitle(_: any, { title }: any) {
+      const res = await Articles.find({ title });
+
+      console.log('getArticleByTitle article:', res);
+
+      return { id: res[0]._id, title: res[0].title, article: res[0].article };
+    },
   },
   Mutation: {
-    async addBook(_, { input }) {
-      const createBook = new Book({
-        id: input.id,
+    async addArticle(_: any, { input }: any) {
+      const createArticle = new Articles({
         title: input.title,
+        article: input.article,
       });
 
-      const res = await createBook.save();
+      const res = await createArticle.save();
 
-      console.log('res ----->', res); // res._dec
+      console.log('add article:', res);
 
-      return {
-        id: res.id,
-        title: res.title,
-      };
+      return { id: res._id, ...res };
+    },
+
+    async deleteArticle(_: any, { ID }) {
+      const wasDeleted = (await Articles.deleteOne({ _id: ID })).deletedCount;
+
+      console.log('wasDeleted:', wasDeleted);
+
+      return wasDeleted;
+    },
+
+    async editArticle(_: any, { ID, articleInput: { title, article } }) {
+      const wasEdited = (
+        await Articles.updateOne({ _id: ID }, { title, article })
+      ).modifiedCount;
+
+      console.log('wasEdited:', wasEdited);
+
+      return wasEdited;
     },
   },
 };
