@@ -18,11 +18,17 @@ const typeDefs = `#graphql
   type Article {
     id: String
     title: String
+    article: String
+    autor: String
+    image: String 
   }
 
   input ArticleInput {
     id: String
     title: String
+    article: String
+    autor: String
+    image: String 
   }
 
   type Query {
@@ -38,6 +44,9 @@ const typeDefs = `#graphql
 const articleSchema = new mongoose.Schema({
   id: String,
   title: String,
+  article: String,
+  autor: String,
+  image: String,
 });
 
 const Article = mongoose.model('Article', articleSchema);
@@ -62,6 +71,9 @@ const resolvers = {
       const createArticle = new Article({
         id: input.id,
         title: input.title,
+        article: input.article,
+        autor: input.autor,
+        image: input.image,
       });
 
       const res = await createArticle.save();
@@ -71,6 +83,9 @@ const resolvers = {
       return {
         id: res.id,
         title: res.title,
+        article: res.article,
+        autor: res.autor,
+        image: res.image,
       };
     },
   },
