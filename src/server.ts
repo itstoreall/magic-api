@@ -9,72 +9,68 @@ dotenv.config();
 
 const PORT = process.env.PORT || 4001;
 
+console.log('PORT', process.env.PORT);
+
 mongoose.connect(process.env.MONGO_DB);
 
 const typeDefs = `#graphql
 
-  type Article {
+  type Book {
     id: String
     title: String
-    article: String
   }
 
-  input ArticleInput {
+  input BookInput {
     id: String
     title: String
-    article: String
   }
 
   type Query {
-    articles: [Article]
+    books: [Book]
   }
 
   type Mutation {
-    addArticle(input: ArticleInput): Article
+    addBook(input: BookInput): Book
   }
 `;
 
 // /*
-const ArticleSchema = new mongoose.Schema({
+const bookSchema = new mongoose.Schema({
   id: String,
   title: String,
-  article: String,
 });
 
-const Article = mongoose.model('Article', ArticleSchema);
+const Book = mongoose.model('Book', bookSchema);
 // */
 
 const resolvers = {
   Query: {
-    articles: async () => {
+    books: async () => {
       try {
-        const res = await Article.find();
+        console.log(111);
 
-        console.log('getAll articles:', res?.length);
-
+        const res = await Book.find();
+        console.log(222, res);
         return res;
       } catch (error) {
         throw new Error('Failed to fetch books');
       }
     },
   },
-
   Mutation: {
-    async addArticle(_: any, { input }: any) {
-      const createArticle = new Article({
+    async addBook(_, { input }) {
+      const createBook = new Book({
         id: input.id,
         title: input.title,
-        article: input.article,
       });
 
-      const res = await createArticle.save();
+      const res = await createBook.save();
 
-      console.log('add article:', res);
+      console.log('res ----->', res); // res._dec
 
       return {
         id: res.id,
         title: res.title,
-        article: res.article,
       };
     },
   },
@@ -91,4 +87,14 @@ const server = new ApolloServer({
 
 startStandaloneServer(server, {
   listen: { port: Number(PORT) },
-}).then(({ url }) => console.log(`server ★(◔.◔)★ ${String(url)}`));
+}).then(({ url }) => console.log(`🚀 Server listening at: ${String(url)}`));
+
+if (process.env.NODE_ENV === 'production') {
+  console.log('===> Running in production mode', process.env.NODE_ENV);
+} else if (process.env.NODE_ENV === 'development') {
+  console.log('===> Running in development mode', process.env.NODE_ENV);
+} else if (process.env.NODE_ENV === 'test') {
+  console.log('===> Running in test mode', process.env.NODE_ENV);
+} else {
+  console.log('===> Unknown environment', process.env.NODE_ENV);
+}
