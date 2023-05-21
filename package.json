@@ -5,6 +5,9 @@
   "repository": "https://github.com/itstoreall/magic-api.git",
   "author": "itstoreall",
   "license": "MIT",
+  "engines": {
+    "node": "16.x"
+  },
   "keywords": [
     "graphql",
     "mongoose"
